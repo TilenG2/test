@@ -8,6 +8,8 @@
     :root {
       --idle-bg: #111111;
       --active-bg: #00d100;
+      --button-bg: #f7f7f7;
+      --button-text: #111111;
     }
 
     * {
@@ -37,6 +39,25 @@
       padding: 16px;
     }
 
+    .start-btn {
+      min-width: 160px;
+      min-height: 56px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 24px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: var(--button-bg);
+      color: var(--button-text);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .start-btn:active {
+      transform: scale(0.98);
+    }
+
     .note {
       position: fixed;
       left: 50%;
@@ -56,10 +77,13 @@
   </style>
 </head>
 <body>
-  <main class="app"></main>
+  <main class="app">
+    <button id="startBtn" class="start-btn" type="button">Start</button>
+  </main>
   <p id="note" class="note"></p>
 
   <script>
+    const startBtn = document.getElementById('startBtn');
     const note = document.getElementById('note');
     let wakeLock = null;
 
@@ -94,7 +118,7 @@
       try {
         await enterFullscreen();
       } catch {
-        note.textContent = 'Fullscreen was blocked by this browser without a user tap.';
+        note.textContent = 'Fullscreen was blocked. Try again and allow fullscreen.';
       }
 
       document.body.classList.add('active');
@@ -107,7 +131,7 @@
       }
     }
 
-    window.addEventListener('load', startMode);
+    startBtn.addEventListener('click', startMode);
   </script>
 </body>
 </html>
