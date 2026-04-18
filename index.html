@@ -93,6 +93,10 @@
       }
     }
 
+    function syncStartButtonVisibility() {
+      startBtn.hidden = Boolean(document.fullscreenElement);
+    }
+
     async function setMaxBrightnessAttempt() {
       if (navigator.brightness && typeof navigator.brightness.set === 'function') {
         await navigator.brightness.set(1);
@@ -132,6 +136,8 @@
     }
 
     startBtn.addEventListener('click', startMode);
+    document.addEventListener('fullscreenchange', syncStartButtonVisibility);
+    syncStartButtonVisibility();
   </script>
 </body>
 </html>
