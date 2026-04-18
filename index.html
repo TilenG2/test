@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start Screen</title>
+  <style>
+    :root {
+      --idle-bg: #111111;
+      --active-bg: #00d100;
+      --button-bg: #f7f7f7;
+      --button-text: #111111;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: var(--idle-bg);
+      transition: background-color 250ms ease;
+    }
+
+    body.active {
+      background: var(--active-bg);
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+
+    .start-btn {
+      min-width: 160px;
+      min-height: 56px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 24px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: var(--button-bg);
+      color: var(--button-text);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .start-btn:active {
+      transform: scale(0.98);
+    }
+
+    .note {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      margin: 0;
+      color: #ffffff;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0 12px;
+      opacity: 0.9;
+    }
+
+    body.active .note {
+      color: #0a320a;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <button id="startBtn" class="start-btn" type="button">Start</button>
+  </main>
+  <p id="note" class="note"></p>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const note = document.getElementById('note');
+    let wakeLock = null;
+
+    async function enterFullscreen() {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+    }
+
+    async function setMaxBrightnessAttempt() {
+      if (navigator.brightness && typeof navigator.brightness.set === 'function') {
+        await navigator.brightness.set(1);
+        return 'Brightness set to maximum.';
+      }
+
+      if (screen.brightness && typeof screen.brightness.set === 'function') {
+        await screen.brightness.set(1);
+        return 'Brightness set to maximum.';
+      }
+
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        return 'Brightness API is unavailable. Screen wake lock is enabled instead.';
+      }
+
+      return 'Brightness control is not available in this browser.';
+    }
+
+    async function startMode() {
+      note.textContent = '';
+
+      try {
+        await enterFullscreen();
+      } catch {
+        note.textContent = 'Fullscreen was blocked. Try again and allow fullscreen.';
+      }
+
+      document.body.classList.add('active');
+
+      try {
+        const message = await setMaxBrightnessAttempt();
+        note.textContent = message;
+      } catch {
+        note.textContent = 'Could not change brightness in this browser.';
+      }
+    }
+
+    startBtn.addEventListener('click', startMode);
+  </script>
+</body>
+</html>
